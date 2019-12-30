@@ -1,46 +1,43 @@
-import sys
 import pygame
-
-# Initialize pygame so it runs in the background and manages things
+import random
 pygame.init()
 
+#creates game window
+win = pygame.display.set_mode((400,300))
+pygame.display.set_caption("Bagels on a Sunday")
 
-# Screen size parameters
-display_width, display_height = 800, 600
+# list of availiable toppings and bagels
+toppings = ['nothing', 'butter', 'cream cheese', 'lox']
+bagels = ['plain', 'everything', 'poppy seed', 'cinnamon raisin']
 
+def random_customer_order():
+    # outputs random order for customers 
+    return ({
+        'topping': random.choice(toppings),
+        'bagel': random.choice(bagels)
+    })
 
-# Returns text as a surface and a rectangle
-def text_objects(text, color, font_type, size):
-    font = pygame.font.SysFont(font_type, size)
-    textSurface = font.render(text, True, color)
-    return textSurface, textSurface.get_rect()
+def display_customer_order(bagel, topping):
+    # displays the customer's order on the screen
+    if bagel == 'plain':
+        pygame.draw.ellipse(win, (255, 204, 153), (50, 150, 100, 50))
+    if topping == 'butter':
+        pygame.draw.ellipse(win, (255, 255, 0), (50, 15, 90, 40))
+    pygame.display.update()
 
-# Displays text at center of screen
-def message_to_screen(msg,color, font_type="Cambria", size=20):
-    textSurf, textRect = text_objects(msg, color, font_type, size)
-    textRect.center = (display_width / 2), (display_height / 2)
-    screen.blit(textSurf, textRect)
+customer_placed_order = False
+run = True
 
+while run == True:
+    pygame.time.delay(50)
 
-# Create a display. Size must be a tuple, which is why it's in parentheses
-screen = pygame.display.set_mode( (display_width, display_height) )
-
-# fill the screen with white
-screen.fill( (255,255,255) )
-# draw text to screen
-message_to_screen("Bagels on a Sunday", (0,0,0), "Times New Roman", 30)
-# update the display
-pygame.display.flip()
-
-# Main loop. Your game would go inside this loop
-while True:
-    # do something for each event in the event queue (list of things that happen)
+    # checks to quit program
     for event in pygame.event.get():
-
-        # This line will print each event to the terminal
-        print(event)
-
-        # Check to see if the current event is a QUIT event
         if event.type == pygame.QUIT:
-            # If so, exit the program
-            sys.exit()
+            run = False
+
+    # generates customer order if not yet placed
+    if customer_placed_order == False:
+        customer_order = random_customer_order()
+        display_customer_order(customer_order['bagel'], customer_order['topping'])
+        customer_placed_order = True
