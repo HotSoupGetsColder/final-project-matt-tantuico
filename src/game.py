@@ -1,9 +1,8 @@
-import pygame
-import random
+import pygame, random
 pygame.init()
 
 #creates game window
-win = pygame.display.set_mode((400,300))
+win = pygame.display.set_mode((64,36))
 pygame.display.set_caption("Bagels on a Sunday")
 
 # list of availiable toppings and bagels
@@ -23,6 +22,13 @@ keybinds = {
         pygame.K_f : bagels[3]}
 }
 
+images = {
+    'misc' : {
+        'test' : pygame.image.load('img/test.png')},
+    'bagel' : {},
+    'topping' : {}
+}
+
 def random_customer_order():
     # outputs random order for customers 
     return ({
@@ -36,6 +42,10 @@ def blank_order():
         'topping': toppings[0],
         'bagel': ''
     })
+
+def update_screen():
+    win.blit(images['misc']['test'], (10,10))
+    pygame.display.update()
 
 generate_customer_order = True
 reset_player_order = True
@@ -77,3 +87,5 @@ while run == True:
                     print('WRONG')
                 generate_customer_order = True
                 reset_player_order = True
+
+    update_screen()
