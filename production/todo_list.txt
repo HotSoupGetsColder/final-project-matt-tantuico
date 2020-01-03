@@ -1,0 +1,16 @@
+Implement graphics
+	bagel
+		bagel
+		toppings
+	customer
+		face
+		hat
+		shirt
+	misc
+		counter
+		background
+		clock?
+Clock
+Point System
+Pause Menu
+Main menu

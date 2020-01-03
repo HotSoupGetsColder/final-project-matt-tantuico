@@ -1,0 +1,3 @@
+Display pixelated game by
+	drawing to miniture surface
+	transform and scale miniture surface to large screen
