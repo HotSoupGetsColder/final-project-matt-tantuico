@@ -1,7 +1,7 @@
 Implement graphics
 	bagel
-		bagel
-		toppings
+		bagel : plain, everything, poppyseed, cinnamon raisin
+		toppings : nothing, butter, cream cheese, lox
 	customer
 		face
 		hat
