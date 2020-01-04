@@ -55,7 +55,7 @@ images = {
     'misc' : {
         'background' : pygame.image.load('img/background.png'),
         'counter' : pygame.image.load('img/counter.png'),
-        'customer' : pygame.image.load('img/customer_concept.png')},
+        'customer' : pygame.image.load('img/concept_customer.png')},
     'bagel' : {
         'plain' : pygame.image.load('img/bagel_plain.png'),
         'everything' : pygame.image.load('img/bagel_everything.png'),
@@ -64,9 +64,22 @@ images = {
     'topping' : {
         'butter' : pygame.image.load('img/topping_butter.png'),
         'cream cheese' : pygame.image.load('img/topping_creamcheese.png'),
-        'lox' : pygame.image.load('img/topping_lox.png')
+        'lox' : pygame.image.load('img/topping_lox.png')},
+    'shirt' : {
+        'plain' : pygame.image.load('img/shirt_plain.png'),
+        'everything' : pygame.image.load('img/shirt_everything.png'),
+        'poppy seed' : pygame.image.load('img/shirt_poppyseed.png'),
+        'cinnamon raisin' : pygame.image.load('img/shirt_cinnamonraisin.png')},
+    'hat' : {
+        'butter' : pygame.image.load('img/hat_butter.png'),
+        'cream cheese' : pygame.image.load('img/hat_creamcheese.png'),
+        'lox' : pygame.image.load('img/hat_lox.png')},
+    'face' : {
+        'red' : pygame.image.load('img/face_red.png'),
+        'yellow' : pygame.image.load('img/face_yellow.png'),
+        'green' : pygame.image.load('img/face_green.png'),
+        'blue' : pygame.image.load('img/face_blue.png')} 
     }
-}
 
 def random_customer_order():
     # outputs random order for customers 
@@ -85,7 +98,13 @@ def blank_order():
 def update_screen():
     # displays game
     miniscreen_surface.blit(images['misc']['background'], (0,0))
-    miniscreen_surface.blit(images['misc']['customer'], (customer_info.x, customer_info.y))
+    for bagel in bagels:
+        if customer_order['bagel'] == bagel:
+            miniscreen_surface.blit(images['shirt'][bagel], (customer_info.x, customer_info.y))
+    miniscreen_surface.blit(images['face']['yellow'], (customer_info.x, customer_info.y))
+    for topping in toppings:
+        if customer_order['topping'] == topping and customer_order['topping'] != 'nothing':
+            miniscreen_surface.blit(images['hat'][topping], (customer_info.x, customer_info.y))    
     for bagel in bagels:
         if player_order['bagel'] == bagel:
             miniscreen_surface.blit(images['bagel'][bagel], (bagel_info.x, bagel_info.y))
