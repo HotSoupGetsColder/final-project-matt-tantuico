@@ -15,6 +15,7 @@ class Object:
         self.y = y
 
 bagel_info = Object(35, 9)
+customer_info = Object(2, 0)
 
 class Screen:
     # class for surfaces
@@ -53,7 +54,8 @@ keybinds = {
 images = {
     'misc' : {
         'background' : pygame.image.load('img/background.png'),
-        'counter' : pygame.image.load('img/counter.png')},
+        'counter' : pygame.image.load('img/counter.png'),
+        'customer' : pygame.image.load('img/customer_concept.png')},
     'bagel' : {
         'plain' : pygame.image.load('img/bagel_plain.png'),
         'everything' : pygame.image.load('img/bagel_everything.png'),
@@ -83,8 +85,7 @@ def blank_order():
 def update_screen():
     # displays game
     miniscreen_surface.blit(images['misc']['background'], (0,0))
-    # miniscreen_surface.blit(images['bagel']['cinnamon raisin'], (bagel.x, bagel.y))
-    # miniscreen_surface.blit(images['topping']['lox'], (bagel.x, bagel. y))
+    miniscreen_surface.blit(images['misc']['customer'], (customer_info.x, customer_info.y))
     for bagel in bagels:
         if player_order['bagel'] == bagel:
             miniscreen_surface.blit(images['bagel'][bagel], (bagel_info.x, bagel_info.y))
