@@ -14,6 +14,8 @@ class Object:
         self.x = x
         self.y = y
 
+bagel_info = Object(35, 9)
+
 class Screen:
     # class for surfaces
     def __init__(self, width, height):
@@ -57,7 +59,11 @@ images = {
         'everything' : pygame.image.load('img/bagel_everything.png'),
         'poppy seed' : pygame.image.load('img/bagel_poppyseed.png'),
         'cinnamon raisin' : pygame.image.load('img/bagel_cinnamonraisin.png')},
-    'topping' : {}
+    'topping' : {
+        'butter' : pygame.image.load('img/topping_butter.png'),
+        'cream cheese' : pygame.image.load('img/topping_creamcheese.png'),
+        'lox' : pygame.image.load('img/topping_lox.png')
+    }
 }
 
 def random_customer_order():
@@ -77,6 +83,14 @@ def blank_order():
 def update_screen():
     # displays game
     miniscreen_surface.blit(images['misc']['background'], (0,0))
+    # miniscreen_surface.blit(images['bagel']['cinnamon raisin'], (bagel.x, bagel.y))
+    # miniscreen_surface.blit(images['topping']['lox'], (bagel.x, bagel. y))
+    for bagel in bagels:
+        if player_order['bagel'] == bagel:
+            miniscreen_surface.blit(images['bagel'][bagel], (bagel_info.x, bagel_info.y))
+    for topping in toppings:
+        if player_order['topping'] == topping and player_order['topping'] != 'nothing':
+            miniscreen_surface.blit(images['topping'][topping], (bagel_info.x, bagel_info.y))    
     miniscreen_surface.blit(images['misc']['counter'], (0,0))
     pygame.transform.scale(miniscreen_surface, (gamescreen.width, gamescreen.height), gamescreen_surface)
     pygame.display.update()
@@ -109,6 +123,8 @@ while run == True:
                 if event.key in keybinds[category]:
                     if category == 'toppings':
                         player_order['topping'] = keybinds['toppings'][event.key]
+                        if player_order['bagel'] == '':
+                            player_order['bagel'] = 'plain'
                     elif category == 'bagels':
                         player_order['bagel'] = keybinds['bagels'][event.key]
                     print(player_order)
