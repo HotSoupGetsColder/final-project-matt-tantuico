@@ -1,14 +1,39 @@
-import pygame, random
+import pygame, random, os
 pygame.init()
 
-#creates game window
-win = pygame.display.set_mode((64,36))
+try:
+    # Change the current working Directory    
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    print('Directory changed')
+except OSError:
+    print('Cannot change the Current Working Directory')
+
+class Object:
+    # class for objects on screen
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+class Screen:
+    # class for surfaces
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+
+# creates game surfaces
+screen_scale = 20
+miniscreen = Screen(64, 36)
+gamescreen = Screen(miniscreen.width * screen_scale, miniscreen.height * screen_scale)
+
+miniscreen_surface = pygame.Surface((miniscreen.width, miniscreen.height))
+gamescreen_surface = pygame.display.set_mode((gamescreen.width, gamescreen.height))
 pygame.display.set_caption("Bagels on a Sunday")
 
 # list of availiable toppings and bagels
 toppings = ['nothing', 'butter', 'cream cheese', 'lox']
 bagels = ['plain', 'everything', 'poppy seed', 'cinnamon raisin']
 
+# player keybind dictionary for bagel customization
 keybinds = {
     'toppings': {
         pygame.K_q : toppings[0],
@@ -22,10 +47,16 @@ keybinds = {
         pygame.K_f : bagels[3]}
 }
 
+# image dictionary
 images = {
     'misc' : {
-        'test' : pygame.image.load('img/test.png')},
-    'bagel' : {},
+        'background' : pygame.image.load('img/background.png'),
+        'counter' : pygame.image.load('img/counter.png')},
+    'bagel' : {
+        'plain' : pygame.image.load('img/bagel_plain.png'),
+        'everything' : pygame.image.load('img/bagel_everything.png'),
+        'poppy seed' : pygame.image.load('img/bagel_poppyseed.png'),
+        'cinnamon raisin' : pygame.image.load('img/bagel_cinnamonraisin.png')},
     'topping' : {}
 }
 
@@ -44,7 +75,10 @@ def blank_order():
     })
 
 def update_screen():
-    win.blit(images['misc']['test'], (10,10))
+    # displays game
+    miniscreen_surface.blit(images['misc']['background'], (0,0))
+    miniscreen_surface.blit(images['misc']['counter'], (0,0))
+    pygame.transform.scale(miniscreen_surface, (gamescreen.width, gamescreen.height), gamescreen_surface)
     pygame.display.update()
 
 generate_customer_order = True
