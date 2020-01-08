@@ -16,6 +16,7 @@ class Object:
 
 bagel_info = Object(35, 9)
 customer_info = Object(2, 0)
+text_info = Object(4, 27)
 
 class Screen:
     # class for surfaces
@@ -32,7 +33,7 @@ class Score:
 score = Score(0, 0)
 
 # creates font object
-font = pygame.font.SysFont("Times New Roman", 5)
+font = pygame.font.SysFont("Comic Sans", 12)
 
 # creates game surfaces
 screen_scale = 15
@@ -139,9 +140,8 @@ def update_screen():
             miniscreen_surface.blit(images['topping'][topping], (bagel_info.x, bagel_info.y))    
     miniscreen_surface.blit(images['misc']['counter'], (0,0))
 
-    text_score_correct = font.render(str(score.correct), True, (0, 0, 0))
-    text_score_incorrect = font.render(str(score.incorrect), True, (0, 0, 0))
-    miniscreen_surface.blit(text_score_correct, (4, miniscreen.height - 8))
+    text_score = font.render('Y: ' + str(score.correct) + "  N: " + str(score.incorrect), False, (0, 50, 0))
+    miniscreen_surface.blit(text_score, (text_info.x, text_info.y))
     pygame.transform.scale(miniscreen_surface, (gamescreen.width, gamescreen.height), gamescreen_surface)
     pygame.display.update()
 
@@ -158,7 +158,7 @@ while run == True:
         player_order = blank_order()
 
         # reset image locations
-        customer_info.y = miniscreen.height
+        customer_info.y = miniscreen.height - 10
 
         new_round = False
     
