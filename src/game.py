@@ -23,8 +23,19 @@ class Screen:
         self.width = width
         self.height = height
 
+class Score:
+    # class for player score
+    def __init__(self, correct, incorrect):
+        self.correct = correct
+        self.incorrect = incorrect
+
+score = Score(0, 0)
+
+# creates font object
+font = pygame.font.SysFont("Times New Roman", 5)
+
 # creates game surfaces
-screen_scale = 20
+screen_scale = 15
 miniscreen = Screen(64, 36)
 gamescreen = Screen(miniscreen.width * screen_scale, miniscreen.height * screen_scale)
 
@@ -35,6 +46,9 @@ pygame.display.set_caption("Bagels on a Sunday")
 # list of availiable toppings and bagels
 toppings = ['nothing', 'butter', 'cream cheese', 'lox']
 bagels = ['plain', 'everything', 'poppy seed', 'cinnamon raisin']
+
+# list of customers' non-essential features
+faces = ['red', 'yellow', 'green', 'blue']
 
 # player keybind dictionary for bagel customization
 keybinds = {
@@ -88,6 +102,11 @@ def random_customer_order():
         'bagel': random.choice(bagels)
     })
 
+def random_customer_features():
+    return ({
+        'face': random.choice(faces)
+    })
+
 def blank_order():
     # outputs blank order
     return ({
@@ -95,13 +114,20 @@ def blank_order():
         'bagel': ''
     })
 
+def animate_screen():
+    global customer_info
+    if customer_info.y > 0:
+        customer_info.y -= 1
+
 def update_screen():
     # displays game
     miniscreen_surface.blit(images['misc']['background'], (0,0))
     for bagel in bagels:
         if customer_order['bagel'] == bagel:
             miniscreen_surface.blit(images['shirt'][bagel], (customer_info.x, customer_info.y))
-    miniscreen_surface.blit(images['face']['yellow'], (customer_info.x, customer_info.y))
+    for face in faces:
+        if customer_features['face'] == face:
+            miniscreen_surface.blit(images['face'][face], (customer_info.x, customer_info.y))
     for topping in toppings:
         if customer_order['topping'] == topping and customer_order['topping'] != 'nothing':
             miniscreen_surface.blit(images['hat'][topping], (customer_info.x, customer_info.y))    
@@ -112,26 +138,30 @@ def update_screen():
         if player_order['topping'] == topping and player_order['topping'] != 'nothing':
             miniscreen_surface.blit(images['topping'][topping], (bagel_info.x, bagel_info.y))    
     miniscreen_surface.blit(images['misc']['counter'], (0,0))
+
+    text_score_correct = font.render(str(score.correct), True, (0, 0, 0))
+    text_score_incorrect = font.render(str(score.incorrect), True, (0, 0, 0))
+    miniscreen_surface.blit(text_score_correct, (4, miniscreen.height - 8))
     pygame.transform.scale(miniscreen_surface, (gamescreen.width, gamescreen.height), gamescreen_surface)
     pygame.display.update()
 
-generate_customer_order = True
-reset_player_order = True
+new_round = True
 run = True
 while run == True:
     pygame.time.delay(25)
 
-    # generates customers order
-    if generate_customer_order == True:
+    # runs start of round code
+    if new_round:
+        # gets new customer order and resets player's order
         customer_order = random_customer_order()
-        generate_customer_order = False
-        print(customer_order)
-
-    # resets player's order
-    if reset_player_order == True:
+        customer_features = random_customer_features()
         player_order = blank_order()
-        reset_player_order = False
 
+        # reset image locations
+        customer_info.y = miniscreen.height
+
+        new_round = False
+    
     # checks to quit program
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -147,15 +177,21 @@ while run == True:
                             player_order['bagel'] = 'plain'
                     elif category == 'bagels':
                         player_order['bagel'] = keybinds['bagels'][event.key]
-                    print(player_order)
 
             # serves and checks order
             if event.key == pygame.K_SPACE:
-                if player_order == customer_order:
-                    print('AYY')
-                else:
-                    print('WRONG')
-                generate_customer_order = True
-                reset_player_order = True
-
+                if player_order != blank_order():
+                    if player_order == customer_order:
+                        print('AYY')
+                        score.correct += 1
+                    else:
+                        print('WRONG')
+                        score.incorrect += 1
+                    new_round = True
+            
+            # checks to exit fullscreen
+            if event.key == pygame.K_ESCAPE:
+                pygame.display.toggle_fullscreen()
+    
+    animate_screen()
     update_screen()
