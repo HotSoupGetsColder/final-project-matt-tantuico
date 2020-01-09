@@ -1,16 +1,8 @@
-Implement graphics
-	bagel
-		bagel : plain, everything, poppyseed, cinnamon raisin
-		toppings : nothing, butter, cream cheese, lox
-	customer
-		face
-		hat
-		shirt
-	misc
-		counter
-		background
-		clock?
-Clock
-Point System
-Pause Menu
-Main menu
+Day Timer/ Clock
+Menus (can be made with while loops within the main loop?):
+	Pause Menu
+		Exit to main menu
+		Exit game
+	Main menu
+Animations
+Customer reaction to order correctness
