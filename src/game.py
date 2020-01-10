@@ -1,4 +1,4 @@
-import pygame, random, os
+import pygame, random, os, sys
 pygame.init()
 
 try:
@@ -68,6 +68,8 @@ keybinds = {
 # image dictionary
 images = {
     'misc' : {
+        'main menu' : pygame.image.load('img/menu_main.png'),
+        'pause menu' : pygame.image.load('img/menu_pause.png'),
         'background' : pygame.image.load('img/background.png'),
         'counter' : pygame.image.load('img/counter.png'),
         'customer' : pygame.image.load('img/concept_customer.png')},
@@ -120,14 +122,18 @@ def animate_screen():
     if customer_info.y > 0:
         customer_info.y -= 1
 
-def update_screen():
+def update_scale_display():
+    pygame.transform.scale(miniscreen_surface, (gamescreen.width, gamescreen.height), gamescreen_surface)
+    pygame.display.update()    
+
+def update_main_screen():
     # displays game
     miniscreen_surface.blit(images['misc']['background'], (0,0))
     for bagel in bagels:
         if customer_order['bagel'] == bagel:
             miniscreen_surface.blit(images['shirt'][bagel], (customer_info.x, customer_info.y))
     for face in faces:
-        if customer_features['face'] == face:
+        if customer_feature['face'] == face:
             miniscreen_surface.blit(images['face'][face], (customer_info.x, customer_info.y))
     for topping in toppings:
         if customer_order['topping'] == topping and customer_order['topping'] != 'nothing':
@@ -139,22 +145,55 @@ def update_screen():
         if player_order['topping'] == topping and player_order['topping'] != 'nothing':
             miniscreen_surface.blit(images['topping'][topping], (bagel_info.x, bagel_info.y))    
     miniscreen_surface.blit(images['misc']['counter'], (0,0))
-
     text_score = font.render('Y: ' + str(score.correct) + "  N: " + str(score.incorrect), False, (0, 50, 0))
     miniscreen_surface.blit(text_score, (text_info.x, text_info.y))
-    pygame.transform.scale(miniscreen_surface, (gamescreen.width, gamescreen.height), gamescreen_surface)
-    pygame.display.update()
+    update_scale_display()
 
-new_round = True
+
+def update_main_menu():
+    miniscreen_surface.blit(images['misc']['main menu'], (0, 0))
+    update_scale_display()
+
+def update_pause_menu():
+    miniscreen_surface.blit(images['misc']['pause menu'], (0, 0))
+    update_scale_display()
+
+new_game = True
 run = True
 while run == True:
     pygame.time.delay(25)
 
+    if new_game:
+        at_main_menu = True
+        new_round = True
+        at_pause_menu = False
+        new_game = False
+
+    while at_pause_menu:
+        update_pause_menu()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                at_pause_menu = False
+                run = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    at_main_menu = True
+                at_pause_menu = False
+
+    while at_main_menu:
+        update_main_menu()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                at_main_menu = False
+                run = False
+            if event.type == pygame.KEYDOWN:
+                at_main_menu = False
+    
     # runs start of round code
     if new_round:
         # gets new customer order and resets player's order
         customer_order = random_customer_order()
-        customer_features = random_customer_features()
+        customer_feature = random_customer_features()
         player_order = blank_order()
 
         # reset image locations
@@ -183,15 +222,19 @@ while run == True:
                 if player_order != blank_order():
                     if player_order == customer_order:
                         print('AYY')
+                        # customer_feature['emotion'] = 'happy'
                         score.correct += 1
                     else:
                         print('WRONG')
                         score.incorrect += 1
+                        # customer_feature['emotion'] = 'sad'
                     new_round = True
-            
-            # checks to exit fullscreen
-            if event.key == pygame.K_ESCAPE:
-                pygame.display.toggle_fullscreen()
+
+            if event.key == pygame.K_p:
+                at_pause_menu = True
     
     animate_screen()
-    update_screen()
+    update_main_screen()
+
+pygame.quit()
+sys.exit()
