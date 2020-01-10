@@ -98,6 +98,13 @@ images = {
         'blue' : pygame.image.load('img/face_blue.png')} 
     }
 
+timer = {
+    'serve customer': {
+        'length' : 1000,
+        'eventid' : 25
+    }
+}
+
 def random_customer_order():
     # outputs random order for customers 
     return ({
@@ -208,27 +215,29 @@ while run == True:
 
         if event.type == pygame.KEYDOWN:
             # checks player key presses to modify bagel
-            for category in keybinds:
-                if event.key in keybinds[category]:
-                    if category == 'toppings':
-                        player_order['topping'] = keybinds['toppings'][event.key]
-                        if player_order['bagel'] == '':
-                            player_order['bagel'] = 'plain'
-                    elif category == 'bagels':
-                        player_order['bagel'] = keybinds['bagels'][event.key]
+            if not stop_orders:
+                for category in keybinds:
+                    if event.key in keybinds[category]:
+                        if category == 'toppings':
+                            player_order['topping'] = keybinds['toppings'][event.key]
+                            if player_order['bagel'] == '':
+                                player_order['bagel'] = 'plain'
+                        elif category == 'bagels':
+                            player_order['bagel'] = keybinds['bagels'][event.key]
 
-            # serves and checks order
-            if event.key == pygame.K_SPACE:
-                if player_order != blank_order():
-                    if player_order == customer_order:
-                        print('AYY')
-                        # customer_feature['emotion'] = 'happy'
-                        score.correct += 1
-                    else:
-                        print('WRONG')
-                        score.incorrect += 1
-                        # customer_feature['emotion'] = 'sad'
-                    new_round = True
+                # serves and checks ordere
+                if event.key == pygame.K_SPACE:
+                    if player_order != blank_order():
+                        if player_order == customer_order:
+                            print('AYY')
+                            # customer_feature['emotion'] = 'happy'
+                            score.correct += 1
+                        else:
+                            print('WRONG')
+                            score.incorrect += 1
+                            # customer_feature['emotion'] = 'sad'
+                        pygame.time.set_timer(timer['serve customer']['eventid'], timer['serve customer']['length'], once)
+                        stop_orders = True
 
             if event.key == pygame.K_p:
                 at_pause_menu = True
