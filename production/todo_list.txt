@@ -1,8 +1,3 @@
 Day Timer/ Clock
-Menus (can be made with while loops within the main loop?):
-	Pause Menu
-		Exit to main menu
-		Exit game
-	Main menu
-Animations
 Customer reaction to order correctness
+Refine Background

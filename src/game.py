@@ -32,6 +32,23 @@ class Score:
 
 score = Score(0, 0)
 
+# clock variables
+clock = pygame.time.Clock()
+fps = 60
+
+class Timer:
+    # class for game timers
+    def __init__(self, original):
+        self.original = original * fps
+        self.current = original * fps
+        self.run = False
+    def reset(self):
+        self.current = self.original
+
+# timers used in program
+reaction = Timer(1)
+day = Timer(30)
+
 # creates font object
 font = pygame.font.SysFont("Comic Sans", 12)
 
@@ -50,6 +67,7 @@ bagels = ['plain', 'everything', 'poppy seed', 'cinnamon raisin']
 
 # list of customers' non-essential features
 faces = ['red', 'yellow', 'green', 'blue']
+emotions = ['neutral', 'happy', 'sad']
 
 # player keybind dictionary for bagel customization
 keybinds = {
@@ -95,15 +113,12 @@ images = {
         'red' : pygame.image.load('img/face_red.png'),
         'yellow' : pygame.image.load('img/face_yellow.png'),
         'green' : pygame.image.load('img/face_green.png'),
-        'blue' : pygame.image.load('img/face_blue.png')} 
+        'blue' : pygame.image.load('img/face_blue.png')},
+    'emotion' : {
+        'neutral' : pygame.image.load('img/emotion_neutral.png'),
+        'happy' : pygame.image.load('img/emotion_happy.png'),
+        'sad' : pygame.image.load('img/emotion_sad.png')}
     }
-
-timer = {
-    'serve customer': {
-        'length' : 1000,
-        'eventid' : 25
-    }
-}
 
 def random_customer_order():
     # outputs random order for customers 
@@ -114,7 +129,8 @@ def random_customer_order():
 
 def random_customer_features():
     return ({
-        'face': random.choice(faces)
+        'face': random.choice(faces),
+        'emotion': 'neutral'
     })
 
 def blank_order():
@@ -142,6 +158,9 @@ def update_main_screen():
     for face in faces:
         if customer_feature['face'] == face:
             miniscreen_surface.blit(images['face'][face], (customer_info.x, customer_info.y))
+    for emotiton in emotions:
+        if customer_feature['emotion'] == emotiton:
+            miniscreen_surface.blit(images['emotion'][emotiton], (customer_info.x, customer_info.y))
     for topping in toppings:
         if customer_order['topping'] == topping and customer_order['topping'] != 'nothing':
             miniscreen_surface.blit(images['hat'][topping], (customer_info.x, customer_info.y))    
@@ -156,7 +175,6 @@ def update_main_screen():
     miniscreen_surface.blit(text_score, (text_info.x, text_info.y))
     update_scale_display()
 
-
 def update_main_menu():
     miniscreen_surface.blit(images['misc']['main menu'], (0, 0))
     update_scale_display()
@@ -165,17 +183,55 @@ def update_pause_menu():
     miniscreen_surface.blit(images['misc']['pause menu'], (0, 0))
     update_scale_display()
 
+def update_timers():
+    global reaction, new_round, day, run
+    if reaction.run:
+        reaction.current -= 1
+    if reaction.current <= 0:
+        new_round = True
+        reaction.reset()
+        reaction.run = False
+    if day.run:
+        day.current -= 1
+    if day.current <= 0:
+        day.run = False
+        run = False
+        day.reset
+
+# new program variables
+at_main_menu = True
+at_pause_menu = False
+at_gameover_menu = False
 new_game = True
 run = True
+
 while run == True:
-    pygame.time.delay(25)
+    clock.tick(fps)
 
     if new_game:
-        at_main_menu = True
         new_round = True
-        at_pause_menu = False
+        score.correct, score.incorrect = 0, 0
+        reaction.run = False
+        reaction.reset()
+        day.run = True
+        day.reset()
         new_game = False
 
+    while at_main_menu:
+        update_main_menu()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                at_main_menu = False
+                run = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    at_main_menu = False
+                    run = False
+                else:
+                    new_game = True
+                    at_pause_menu = True
+                    at_main_menu = False
+    
     while at_pause_menu:
         update_pause_menu()
         for event in pygame.event.get():
@@ -187,15 +243,6 @@ while run == True:
                     at_main_menu = True
                 at_pause_menu = False
 
-    while at_main_menu:
-        update_main_menu()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                at_main_menu = False
-                run = False
-            if event.type == pygame.KEYDOWN:
-                at_main_menu = False
-    
     # runs start of round code
     if new_round:
         # gets new customer order and resets player's order
@@ -203,47 +250,49 @@ while run == True:
         customer_feature = random_customer_features()
         player_order = blank_order()
 
-        # reset image locations
+        # resets image locations
         customer_info.y = miniscreen.height - 10
 
         new_round = False
-    
-    # checks to quit program
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
 
-        if event.type == pygame.KEYDOWN:
-            # checks player key presses to modify bagel
-            if not stop_orders:
-                for category in keybinds:
-                    if event.key in keybinds[category]:
-                        if category == 'toppings':
-                            player_order['topping'] = keybinds['toppings'][event.key]
-                            if player_order['bagel'] == '':
-                                player_order['bagel'] = 'plain'
-                        elif category == 'bagels':
-                            player_order['bagel'] = keybinds['bagels'][event.key]
+    if not at_main_menu and not at_pause_menu and run:
+        for event in pygame.event.get():    
+            # checks to quit program
+            if event.type == pygame.QUIT:
+                run = False
 
-                # serves and checks ordere
-                if event.key == pygame.K_SPACE:
-                    if player_order != blank_order():
-                        if player_order == customer_order:
-                            print('AYY')
-                            # customer_feature['emotion'] = 'happy'
-                            score.correct += 1
-                        else:
-                            print('WRONG')
-                            score.incorrect += 1
-                            # customer_feature['emotion'] = 'sad'
-                        pygame.time.set_timer(timer['serve customer']['eventid'], timer['serve customer']['length'], once)
-                        stop_orders = True
+            if event.type == pygame.KEYDOWN:
+                # doesn't allow player to change bagel if customer is emoting
+                if not reaction.run:
+                    # checks player key presses to modify bagel
+                    for category in keybinds:
+                        if event.key in keybinds[category]:
+                            if category == 'toppings':
+                                player_order['topping'] = keybinds['toppings'][event.key]
+                                if player_order['bagel'] == '':
+                                    player_order['bagel'] = 'plain'
+                            elif category == 'bagels':
+                                player_order['bagel'] = keybinds['bagels'][event.key]
 
-            if event.key == pygame.K_p:
-                at_pause_menu = True
-    
-    animate_screen()
-    update_main_screen()
+                    # serves and checks order
+                    if event.key == pygame.K_SPACE:
+                        if player_order != blank_order():
+                            if player_order == customer_order:
+                                print('AYY')
+                                customer_feature['emotion'] = 'happy'
+                                score.correct += 1
+                            else:
+                                print('WRONG')
+                                score.incorrect += 1
+                                customer_feature['emotion'] = 'sad'
+                            reaction.run = True
+
+                if event.key == pygame.K_ESCAPE:
+                    at_pause_menu = True
+
+        update_timers()
+        animate_screen()
+        update_main_screen()
 
 pygame.quit()
 sys.exit()
