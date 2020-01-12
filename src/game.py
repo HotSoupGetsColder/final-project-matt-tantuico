@@ -46,7 +46,7 @@ class Timer:
         self.current = self.original
 
 # timers used in program
-reaction = Timer(1)
+reaction = Timer(.5)
 day = Timer(30)
 
 # creates font object
@@ -90,6 +90,7 @@ images = {
         'pause menu' : pygame.image.load('img/menu_pause.png'),
         'background' : pygame.image.load('img/background.png'),
         'counter' : pygame.image.load('img/counter.png'),
+        'closed' : pygame.image.load('img/background_closed.png'),
         'customer' : pygame.image.load('img/concept_customer.png')},
     'bagel' : {
         'plain' : pygame.image.load('img/bagel_plain.png'),
@@ -171,7 +172,7 @@ def update_main_screen():
         if player_order['topping'] == topping and player_order['topping'] != 'nothing':
             miniscreen_surface.blit(images['topping'][topping], (bagel_info.x, bagel_info.y))    
     miniscreen_surface.blit(images['misc']['counter'], (0,0))
-    text_score = font.render('Y: ' + str(score.correct) + "  N: " + str(score.incorrect), False, (0, 50, 0))
+    text_score = font.render(str(day.current // fps), False, (0, 50, 0))
     miniscreen_surface.blit(text_score, (text_info.x, text_info.y))
     update_scale_display()
 
@@ -183,8 +184,14 @@ def update_pause_menu():
     miniscreen_surface.blit(images['misc']['pause menu'], (0, 0))
     update_scale_display()
 
+def update_gameover_menu():
+    miniscreen_surface.blit(images['misc']['closed'], (0, 0))
+    text_score = font.render('Y: ' + str(score.correct) + "  N: " + str(score.incorrect), False, (0, 50, 0))
+    miniscreen_surface.blit(text_score, (text_info.x, text_info.y))    
+    update_scale_display()
+
 def update_timers():
-    global reaction, new_round, day, run
+    global reaction, new_round, day, at_gameover_menu
     if reaction.run:
         reaction.current -= 1
     if reaction.current <= 0:
@@ -195,7 +202,7 @@ def update_timers():
         day.current -= 1
     if day.current <= 0:
         day.run = False
-        run = False
+        at_gameover_menu = True
         day.reset
 
 # new program variables
@@ -208,15 +215,6 @@ run = True
 while run == True:
     clock.tick(fps)
 
-    if new_game:
-        new_round = True
-        score.correct, score.incorrect = 0, 0
-        reaction.run = False
-        reaction.reset()
-        day.run = True
-        day.reset()
-        new_game = False
-
     while at_main_menu:
         update_main_menu()
         for event in pygame.event.get():
@@ -227,11 +225,21 @@ while run == True:
                 if event.key == pygame.K_ESCAPE:
                     at_main_menu = False
                     run = False
-                else:
+                elif event.key == pygame.K_SPACE:
                     new_game = True
                     at_pause_menu = True
                     at_main_menu = False
     
+    if new_game:
+        new_round = True
+        score.correct, score.incorrect = 0, 0
+        reaction.run = False
+        reaction.reset()
+        day.run = True
+        day.reset()
+        at_gameover_menu = False
+        new_game = False
+
     while at_pause_menu:
         update_pause_menu()
         for event in pygame.event.get():
@@ -241,7 +249,20 @@ while run == True:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     at_main_menu = True
-                at_pause_menu = False
+                    at_pause_menu = False
+                elif event.key == pygame.K_SPACE:
+                    at_pause_menu = False
+
+    while at_gameover_menu:
+        update_gameover_menu()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                at_gameover_menu = False
+                run = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    at_gameover_menu = False
+                    at_main_menu = True
 
     # runs start of round code
     if new_round:
@@ -255,7 +276,7 @@ while run == True:
 
         new_round = False
 
-    if not at_main_menu and not at_pause_menu and run:
+    if not at_main_menu and not at_pause_menu and not at_gameover_menu and run:
         for event in pygame.event.get():    
             # checks to quit program
             if event.type == pygame.QUIT:
@@ -293,6 +314,6 @@ while run == True:
         update_timers()
         animate_screen()
         update_main_screen()
-
+        
 pygame.quit()
 sys.exit()
