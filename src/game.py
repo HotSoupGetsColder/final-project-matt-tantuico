@@ -129,6 +129,7 @@ def random_customer_order():
     })
 
 def random_customer_features():
+    # outputs non-essential customer features
     return ({
         'face': random.choice(faces),
         'emotion': 'neutral'
@@ -142,11 +143,13 @@ def blank_order():
     })
 
 def animate_screen():
+    # animates character
     global customer_info
     if customer_info.y > 0:
         customer_info.y -= 1
 
 def update_scale_display():
+    # scales display from small surface to screen
     pygame.transform.scale(miniscreen_surface, (gamescreen.width, gamescreen.height), gamescreen_surface)
     pygame.display.update()    
 
@@ -177,20 +180,24 @@ def update_main_screen():
     update_scale_display()
 
 def update_main_menu():
+    # displays main menu
     miniscreen_surface.blit(images['misc']['main menu'], (0, 0))
     update_scale_display()
 
 def update_pause_menu():
+    # displays pause menu
     miniscreen_surface.blit(images['misc']['pause menu'], (0, 0))
     update_scale_display()
 
 def update_gameover_menu():
+    # displays game over menu
     miniscreen_surface.blit(images['misc']['closed'], (0, 0))
     text_score = font.render('Y: ' + str(score.correct) + "  N: " + str(score.incorrect), False, (0, 50, 0))
     miniscreen_surface.blit(text_score, (text_info.x, text_info.y))    
     update_scale_display()
 
 def update_timers():
+    # counts down the timers
     global reaction, new_round, day, at_gameover_menu
     if reaction.run:
         reaction.current -= 1
@@ -215,6 +222,7 @@ run = True
 while run == True:
     clock.tick(fps)
 
+    # main menu loop
     while at_main_menu:
         update_main_menu()
         for event in pygame.event.get():
@@ -230,6 +238,7 @@ while run == True:
                     at_pause_menu = True
                     at_main_menu = False
     
+    # runs new game code
     if new_game:
         new_round = True
         score.correct, score.incorrect = 0, 0
@@ -240,6 +249,7 @@ while run == True:
         at_gameover_menu = False
         new_game = False
 
+    # pause menu loop
     while at_pause_menu:
         update_pause_menu()
         for event in pygame.event.get():
@@ -253,6 +263,7 @@ while run == True:
                 elif event.key == pygame.K_SPACE:
                     at_pause_menu = False
 
+    # game over menu loop
     while at_gameover_menu:
         update_gameover_menu()
         for event in pygame.event.get():
@@ -308,6 +319,7 @@ while run == True:
                                 customer_feature['emotion'] = 'sad'
                             reaction.run = True
 
+                # checks to exit game
                 if event.key == pygame.K_ESCAPE:
                     at_pause_menu = True
 
@@ -315,5 +327,6 @@ while run == True:
         animate_screen()
         update_main_screen()
         
+# quits game
 pygame.quit()
 sys.exit()
