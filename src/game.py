@@ -47,7 +47,7 @@ class Timer:
 
 # timers used in program
 reaction = Timer(.5)
-day = Timer(30)
+day = Timer(30 + 1)
 
 # creates font object
 font = pygame.font.SysFont("Comic Sans", 12)
@@ -266,6 +266,7 @@ while run == True:
     # game over menu loop
     while at_gameover_menu:
         update_gameover_menu()
+        pygame.time.delay(1000)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 at_gameover_menu = False
