@@ -219,7 +219,7 @@ at_gameover_menu = False
 new_game = True
 run = True
 
-while run == True:
+while run:
     clock.tick(fps)
 
     # main menu loop
